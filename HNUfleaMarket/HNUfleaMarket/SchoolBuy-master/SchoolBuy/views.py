@@ -25,3 +25,16 @@ def register(request):
     else:
         form = Register()
     return render(request, 'SchoolBuy/Register.html', {'form': form,'code_err':code_err})
+
+@login_required
+#用户个人信息
+def user_message(request):
+    user = request.user
+    profile = UserProfile.objects.get(User=user)
+    #包含下架商品
+    goods = GoodsMessage.objects.filter(Owner=user)
+
+    #系统通知个数
+    log = len(GoodsLog.objects.filter(To = user,Readed=False))
+
+    return render(request,'SchoolBuy/MyMessage.html', {'log':log,'profile': profile, 'goods': goods})
