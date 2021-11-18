@@ -61,3 +61,24 @@ CONTEXT_PROCESSORS = [
     'django.contrib.auth.context_processors.auth',
     'django.contrib.messages.context_processors.messages',
 ]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': CONTEXT_PROCESSORS,
+        },
+    },
+    {
+        'BACKEND': 'comm.backends.Jinja2Backend',
+        'DIRS': ['templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'environment': 'comm.env.environment',
+            'context_processors': CONTEXT_PROCESSORS,
+            #'extensions': [your extensions here],
+        },
+    },
+]
