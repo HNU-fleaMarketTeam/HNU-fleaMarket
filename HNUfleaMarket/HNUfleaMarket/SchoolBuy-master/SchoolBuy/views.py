@@ -45,6 +45,25 @@ def login(request):
     else:
         return render(request, 'SchoolBuy/Login.html')
 
+#保存头像
+def savehead(pic):
+    if not os.path.exists(os.path.join(settings.MEDIA_ROOT, 'head')):
+        os.makedirs(os.path.join(settings.MEDIA_ROOT, 'head'))
+    randname = ''.join(random.sample(string.ascii_letters + string.digits, 24))
+    randname += '.' + pic.name.split('.')[-1]
+    full_path = os.path.join(settings.MEDIA_ROOT, 'head', randname)
+    fd = open(full_path, 'wb+')
+    for chunks in pic.chunks():
+        fd.write(chunks)
+    fd.close()
+    if (filetype(full_path) == 'unknown'):
+        os.remove(full_path)
+        return None
+    else:
+        nn = creat_head(full_path)
+        os.remove(full_path)
+        return nn
+
 @login_required
 #绑定邮箱
 def bind_email(request):
