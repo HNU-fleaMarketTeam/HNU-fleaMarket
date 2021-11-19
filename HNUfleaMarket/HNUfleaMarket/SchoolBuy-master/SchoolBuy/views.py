@@ -26,6 +26,56 @@ def register(request):
         form = Register()
     return render(request, 'SchoolBuy/Register.html', {'form': form,'code_err':code_err})
 
+#登录
+def login(request):
+    if request.method == 'POST':
+        name = request.POST.get('username', '')
+        passwd = request.POST.get('password', '')
+        user = auth.authenticate(username=name, password=passwd)
+        if user is not None and user.is_active:
+            auth.login(request, user)
+            profile = UserProfile.objects.get(User=user)
+            request.session['nick'] = profile.Nick
+            request.session['avatar'] = profile.Avatar
+            return HttpResponseRedirect('/')
+
+        else:
+            return render(request, 'SchoolBuy/Login.html', {'error': '用户名和密码不匹配！'})
+
+    else:
+        return render(request, 'SchoolBuy/Login.html')
+
+@login_required
+#绑定邮箱
+def bind_email(request):
+    if request.method != 'POST':
+        return HttpResponseRedirect('/me/edit/')
+
+    form = UserMessage()
+    pass_form = ChangePasswd()
+    profile = UserProfile.objects.get(User=request.user)
+    if request.user.email:
+        return HttpResponse("error!重复绑定")
+    user = request.user
+    email_form = BindEmailForm(request.POST)
+    if profile.EmailCodeTime and (datetime.datetime.now()-profile.EmailCodeTime).seconds <= 3600:
+        email_form.add_error('email','1小时内不能重复发送激活邮件')
+        return render(request, 'SchoolBuy/ChangeMyself.html',
+                      {'profile': profile, 'form': form,
+                       'pass_form': pass_form, 'email_form': email_form,
+                       'user': request.user})
+
+    else:
+        if email_form.is_valid():
+            send_required_mail(email_form.cleaned_data['email'],profile)
+            return HttpResponseRedirect('/me/edit/')
+
+        return render(request, 'SchoolBuy/ChangeMyself.html',
+                      {'profile': profile, 'form': form,
+                       'pass_form': pass_form, 'email_form': email_form,
+                       'user': request.user})
+
+
 @login_required
 #用户个人信息
 def user_message(request):
