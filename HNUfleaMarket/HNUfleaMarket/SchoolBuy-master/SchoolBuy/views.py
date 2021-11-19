@@ -45,7 +45,7 @@ def login(request):
     else:
         return render(request, 'SchoolBuy/Login.html')
 
-#保存头像
+    #保存头像
 def savehead(pic):
     if not os.path.exists(os.path.join(settings.MEDIA_ROOT, 'head')):
         os.makedirs(os.path.join(settings.MEDIA_ROOT, 'head'))
