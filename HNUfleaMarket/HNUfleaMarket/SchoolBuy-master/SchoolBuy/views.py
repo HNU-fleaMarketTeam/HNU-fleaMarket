@@ -93,7 +93,92 @@ def bind_email(request):
                       {'profile': profile, 'form': form,
                        'pass_form': pass_form, 'email_form': email_form,
                        'user': request.user})
+    
+    @login_required
+#修改密码
+def change_passwd(request):
+    if request.method != 'POST':
+        return HttpResponseRedirect('/me/edit/')
+    else:
+        profile = UserProfile.objects.get(User=request.user)
+        form = UserMessage(instance=profile)
+        pass_form = ChangePasswd(request.POST)
+        passwd = request.POST.get('old_passwd',None)
+        name = request.user.username
+        user = auth.authenticate(username=name,password=passwd)
+        email_form = BindEmailForm()
+        if not user:
+            pass_form.add_error('old_passwd','原密码错误！')
+            return render(request, 'SchoolBuy/ChangeMyself.html', {'profile': profile,
+                                                                   'form': form,
+                                                                   'user': request.user,
+                                                                   'email_form': email_form,
+                                                                   'pass_form':pass_form,
+                                                                   })
+        if pass_form.is_valid():
+            user.set_password(pass_form.cleaned_data['new_passwd'])
+            user.save()
+            auth.logout(request)
+            request.session.clear()
+            return render(request, "SchoolBuy/doing_success.html", {'mes': '修改密码'})
+    return render(request, 'SchoolBuy/ChangeMyself.html', {'profile': profile,
+                                                           'form': form,
+                                                           'user': request.user,
+                                                           'email_form': email_form,
+                                                           'pass_form': pass_form})
 
+@csrf_exempt
+def verifi_email(request):
+    code = request.GET.get('code',None)
+    code = UserProfile.objects.filter(EmailCode=code).first()
+    if not code:
+        raise Http404()
+    if (datetime.datetime.now()-code.EmailCodeTime).seconds >= 3600*24:
+        return HttpResponse('验证链接已经过期，请重新生成！')
+    else:
+        user = code.User
+        temp_email = base64.b64decode(code.EmailCode[:-24].encode('utf8'))
+        user.email = temp_email
+        user.save()
+        code.EmailCode = None
+        code.EmailCodeTime = None
+        code.save()
+        return HttpResponse('激活成功！')
+
+@login_required
+def del_email(request):
+    user = request.user
+    user.email=''
+    user.save()
+    return HttpResponseRedirect('/me/edit/')
+
+def send_passwd_mail(mail,profile):
+    str = (base64.b64encode(mail.encode('utf8'))).decode('utf8')
+    str += ''.join(random.sample(string.ascii_letters + string.digits, 24))
+    profile.PasswdCode = str
+    profile.PasswdCodeTime = datetime.datetime.now()
+    profile.save()
+    url = '请点击这个链接来重新设定您的密码(24小时内有效)\n' + settings.HOST_URL_ADDRESS + '/comm/passwd/?code='+str
+    send_mail('重置密码',url,settings.DEFAULT_FROM_EMAIL,[mail,],fail_silently=False)
+
+    #输入邮箱找回密码
+def find_passwd(request):
+    if request.method == 'GET':
+        form = FindPasswdForm()
+
+    else:
+        form = FindPasswdForm(request.POST)
+        if form.is_valid():
+            user = User.objects.get(email=form.cleaned_data['email'])
+            profile = UserProfile.objects.get(User=user)
+            if profile.PasswdCodeTime and (datetime.datetime.now() - profile.PasswdCodeTime).seconds <= 1800 :
+                form.add_error('email','已于'+profile.PasswdCodeTime.strftime('%Y-%m-%d %H:%M:%S')+
+                               '发送了重置邮件，半小时内无法再次发送')
+
+            else:
+                send_passwd_mail(form.cleaned_data['email'],profile)
+                return HttpResponse('已向你发送了重置密码链接，快去邮箱查看吧！')
+    return render(request,'SchoolBuy/ForgetPasswd.html',{'form':form})
 
 @login_required
 #用户个人信息
