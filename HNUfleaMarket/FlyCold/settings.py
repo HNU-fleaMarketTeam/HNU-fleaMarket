@@ -138,3 +138,10 @@ LOGIN_URL = '/login/'
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBa
+#方便大家测试贡献出来的邮箱
+EMAIL_USE_TLS = False
+EMAIL_HOST = 'smtp.163.com'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = 'flywithme_fatret@163.com'
+EMAIL_HOST_PASSWORD = '52Django'
+DEFAULT_FROM_EMAIL = '校园买 <flywithme_fatret@163.com>'
