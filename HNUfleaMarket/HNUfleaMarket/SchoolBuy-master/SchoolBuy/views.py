@@ -95,6 +95,8 @@ def bind_email(request):
                        'user': request.user})
     
     @login_required
+    
+@login_required
 #修改密码
 def change_passwd(request):
     if request.method != 'POST':
