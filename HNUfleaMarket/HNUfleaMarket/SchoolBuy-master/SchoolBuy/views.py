@@ -63,6 +63,52 @@ def savehead(pic):
         nn = creat_head(full_path)
         os.remove(full_path)
         return nn
+    
+    #修改自身信息
+@login_required
+def change_myself(request):
+    pass_form = ChangePasswd()
+    email_form = BindEmailForm()
+    profile = UserProfile.objects.get(User=request.user)
+    if profile.EmailCode:
+        temp_email = base64.b64decode(profile.EmailCode[:-24].encode('utf8'))
+        email_form = BindEmailForm({'email':temp_email})
+        email_form.add_error('email','你在'+profile.EmailCodeTime.strftime('%Y-%m-%d %H:%M:%S')+
+                             '提交了邮箱，请在24小时内点击链接激活，并且一小时之内不能再次发送激活邮件')
+    if request.method != 'POST':
+        form = UserMessage(instance=profile)
+    else:
+        form = UserMessage(request.POST)
+        if form.is_valid():
+            profile.Nick = form.cleaned_data['Nick']
+            profile.save()
+            request.session['nick'] = profile.Nick
+
+            pic = request.FILES.get('Avatar')
+            if pic:
+                nn = savehead(pic)
+                if nn:
+                    #非系统图片就删除以前的图片
+                    if(str(profile.Avatar)[:6] == '/media'):
+                        os.remove(settings.BASE_DIR+str(profile.Avatar))
+
+                    profile.Avatar = nn
+                    profile.save()
+                    request.session['avatar'] = nn
+
+    return render(request,'SchoolBuy/ChangeMyself.html',
+                  {'profile':profile,'form':form,
+                   'pass_form':pass_form,'email_form':email_form,
+                   'user': request.user})
+
+def send_required_mail(mail,profile):
+    str = (base64.b64encode(mail.encode('utf8'))).decode('utf8')
+    str += ''.join(random.sample(string.ascii_letters + string.digits, 24))
+    profile.EmailCode = str
+    profile.EmailCodeTime = datetime.datetime.now()
+    profile.save()
+    url = '请点击这个链接来激活您的邮箱绑定(24小时有效)\n' + settings.HOST_URL_ADDRESS + '/comm/email/?code='+str
+    send_mail('邮箱绑定',url,settings.DEFAULT_FROM_EMAIL,[mail,],fail_silently=False)
 
 @login_required
 #绑定邮箱
