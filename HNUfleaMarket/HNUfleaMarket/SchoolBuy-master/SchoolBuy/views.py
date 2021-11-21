@@ -64,6 +64,19 @@ def savehead(pic):
         os.remove(full_path)
         return nn
     
+    @login_required
+#用户个人信息
+def user_message(request):
+    user = request.user
+    profile = UserProfile.objects.get(User=user)
+    #包含下架商品
+    goods = GoodsMessage.objects.filter(Owner=user)
+
+    #系统通知个数
+    log = len(GoodsLog.objects.filter(To = user,Readed=False))
+
+    return render(request,'SchoolBuy/MyMessage.html', {'log':log,'profile': profile, 'goods': goods})
+    
     #修改自身信息
 @login_required
 def change_myself(request):
@@ -109,6 +122,7 @@ def send_required_mail(mail,profile):
     profile.save()
     url = '请点击这个链接来激活您的邮箱绑定(24小时有效)\n' + settings.HOST_URL_ADDRESS + '/comm/email/?code='+str
     send_mail('邮箱绑定',url,settings.DEFAULT_FROM_EMAIL,[mail,],fail_silently=False)
+
 
 @login_required
 #绑定邮箱
@@ -228,34 +242,30 @@ def find_passwd(request):
                 return HttpResponse('已向你发送了重置密码链接，快去邮箱查看吧！')
     return render(request,'SchoolBuy/ForgetPasswd.html',{'form':form})
 
-@login_required
-#用户个人信息
-def user_message(request):
-    user = request.user
-    profile = UserProfile.objects.get(User=user)
-    #包含下架商品
-    goods = GoodsMessage.objects.filter(Owner=user)
-
-    #系统通知个数
-    log = len(GoodsLog.objects.filter(To = user,Readed=False))
-
-    return render(request,'SchoolBuy/MyMessage.html', {'log':log,'profile': profile, 'goods': goods})
-
-#保存头像
-def savehead(pic):
-    if not os.path.exists(os.path.join(settings.MEDIA_ROOT, 'head')):
-        os.makedirs(os.path.join(settings.MEDIA_ROOT, 'head'))
-    randname = ''.join(random.sample(string.ascii_letters + string.digits, 24))
-    randname += '.' + pic.name.split('.')[-1]
-    full_path = os.path.join(settings.MEDIA_ROOT, 'head', randname)
-    fd = open(full_path, 'wb+')
-    for chunks in pic.chunks():
-        fd.write(chunks)
-    fd.close()
-    if (filetype(full_path) == 'unknown'):
-        os.remove(full_path)
-        return None
+    #重置密码
+def reset_passwd(request):
+    if request.method == 'GET':
+        code = request.GET.get('code',None)
+        profile = UserProfile.objects.filter(PasswdCode = code).first()
+        if profile and (datetime.datetime.now()-profile.PasswdCodeTime).seconds <= 3600*24:
+            form = ResetPasswdForm({'code':code})
+            return render(request,"SchoolBuy/ResetPasswd.html",{'form':form})
+        else:
+            return HttpResponse("链接已过期或不存在！")
     else:
-        nn = creat_head(full_path)
-        os.remove(full_path)
-        return nn
+        code = request.POST.get('code',None)
+        profile = UserProfile.objects.filter(PasswdCode=code).first()
+        if profile and (datetime.datetime.now() - profile.PasswdCodeTime).seconds <= 3600 * 24:
+            form = ResetPasswdForm(request.POST)
+            if form.is_valid():
+                user = profile.User
+                user.set_password(form.cleaned_data['new_passwd'])
+                user.save()
+                profile.PasswdCode = None
+                profile.PasswdCodeTime = None
+                profile.save()
+                return render(request, "SchoolBuy/doing_success.html", {'mes': '重置密码'})
+            else:
+                return render(request,'SchoolBuy/ResetPasswd.html',{'form':form})
+        else:
+            return HttpResponse("链接已过期或不存在！")
