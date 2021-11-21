@@ -145,3 +145,10 @@ EMAIL_PORT = 25
 EMAIL_HOST_USER = 'flywithme_fatret@163.com'
 EMAIL_HOST_PASSWORD = '52Django'
 DEFAULT_FROM_EMAIL = '校园买 <flywithme_fatret@163.com>'
+
+ADMIN_EMAIL = '1041984720@qq.com'  #接受用户注册信息的管理员邮箱
+
+if DEBUG:
+    HOST_URL_ADDRESS = 'http://127.0.0.1:8000'
+else:
+    HOST_URL_ADDRESS = 'http://flycold.cn'
