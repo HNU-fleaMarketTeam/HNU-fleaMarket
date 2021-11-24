@@ -163,7 +163,6 @@ def send_required_mail(mail,profile):
     url = '请点击这个链接来激活您的邮箱绑定(24小时有效)\n' + settings.HOST_URL_ADDRESS + '/comm/email/?code='+str
     send_mail('邮箱绑定',url,settings.DEFAULT_FROM_EMAIL,[mail,],fail_silently=False)
 
-
 @login_required
 #绑定邮箱
 def bind_email(request):
