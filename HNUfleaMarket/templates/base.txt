@@ -30,3 +30,10 @@
                     <img src="/static/SchoolBuy/images/HNU.png" class="img-responsive" alt="Responsive image"  />
     				<!--<img src="" width="50" height="50" class="logo"/>-->
     			</a>
+		</div>
+    		<ul class="nav navbar-nav">
+                <li class="active"><a href="/">首页</a></li>
+    			<li><a href="/push_goods/">发布商品</a></li>
+    			<li><a href="/all/">全部商品</a></li>
+    			<li class="navslip" id="navslip"></li>
+    		</ul>
