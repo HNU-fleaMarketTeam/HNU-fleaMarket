@@ -21,3 +21,12 @@
     <script src="https://magicbox.bkclouds.cc/static_api/v3/bk/js/bk.js"></script>
 </head>
 
+<body style="padding-top: 55px">
+<!--HTML-->
+    <nav>
+    	<div class="navbar king-horizontal-nav1 navbar-fixed-top" id="horizontal_nav_demo10">
+    		<div class="navbar-header">
+    			<a href="/" class="navbar-brand">
+                    <img src="/static/SchoolBuy/images/HNU.png" class="img-responsive" alt="Responsive image"  />
+    				<!--<img src="" width="50" height="50" class="logo"/>-->
+    			</a>
