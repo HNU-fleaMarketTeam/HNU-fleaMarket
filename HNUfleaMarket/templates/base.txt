@@ -37,3 +37,14 @@
     			<li><a href="/all/">全部商品</a></li>
     			<li class="navslip" id="navslip"></li>
     		</ul>
+		<div class="navbar-header pull-right">
+    			<ul class="nav">
+    				<li class="user-info">
+
+    					{% if request.session.nick %}
+    					<a href="/me/">
+
+    						<span class="f12">{{ request.session.nick }}</span><img src="{{ request.session.avatar }}" class="img-rounded"/>
+                        </a>
+                            <a href="/logout/">退出</a>
+
