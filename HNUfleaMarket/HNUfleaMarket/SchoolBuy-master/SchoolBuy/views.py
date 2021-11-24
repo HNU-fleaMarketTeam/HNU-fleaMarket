@@ -44,6 +44,46 @@ def login(request):
 
     else:
         return render(request, 'SchoolBuy/Login.html')
+    
+    #所有商品
+@csrf_exempt
+def goods_list(request):
+    str = ''
+    each = 1  # 每页显示数量
+    list_page = 5  # 一共显示多少个链接页 偶数会+1
+    page = request.GET.get('page', '1')
+    try:
+        page = int(page)
+    except:
+        raise Http404()
+    start = (page-1) * each
+    end = page * each
+    goods = GoodsMessage.objects.filter(Is_alive=True)
+    form = SearchForm(request.GET)
+    if form.is_valid():
+        name = form.cleaned_data['name']
+        type = form.cleaned_data['type']
+        if name:
+            str = str+'&name='+request.GET.get('name')
+            goods = goods.filter(Title__contains=name)
+        if type:
+            str = str + '&type='+request.GET.get('type')
+            goods = goods.filter(Category = type)
+    max = goods.count()
+    goods = goods[start:end]
+    if not goods:
+        return render(request, "SchoolBuy/No_Goods.html")
+    lastpage = math.ceil(max*1.0 / each)  #统一python2
+    pg = pagiton()
+    pg.list = return_page_list(lastpage,page,list_page)
+    pg.now = page
+    if page == 1 :
+        pg.hasHead = False
+    if page == lastpage:
+        pg.hasEnd = False
+    pg.end = lastpage
+    pg.canshu = str
+    return render(request,'SchoolBuy/GoodsList.html',{'goods':goods,'form':form,'page':pg})
 
     #保存头像
 def savehead(pic):
