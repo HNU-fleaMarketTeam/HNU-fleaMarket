@@ -57,5 +57,27 @@
     		</div>
     	</div>
     </nav>
-			   
+<script type="text/javascript">
+	//horizontal_nav_demo10_js_start
+	$(function(){
+		var slip=$("#navslip");
+		var flag=true;
+		$(".navbar-nav").on("mouseenter","li",function(){
+			slip.show();
+			if(flag){
+				slip.css({width:$(this).width(),left:parseInt($(this).position().left)})
+				flag=false;
+			}else{
+				slip.stop().animate({
+					width:$(this).width(),
+					left:parseInt($(this).position().left)
+				})
+			}
+		});
+		$(".navbar-nav").on("mouseleave",function(){
+			slip.hide();
+			flag=true;
+		});
+	});
+</script>
 			
