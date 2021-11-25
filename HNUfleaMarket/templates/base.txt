@@ -45,6 +45,17 @@
     					<a href="/me/">
 
     						<span class="f12">{{ request.session.nick }}</span><img src="{{ request.session.avatar }}" class="img-rounded"/>
-                        </a>
-                            <a href="/logout/">退出</a>
-
+                        		</a>
+                           			 <a href="/logout/">退出</a>
+					{% else %}
+                   			<a href="/login/">
+                        		登录/注册
+    					</a>
+                       		 	{% endif %}
+    				</li>
+    			</ul>
+    		</div>
+    	</div>
+    </nav>
+			   
+			
