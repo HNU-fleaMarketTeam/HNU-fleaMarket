@@ -80,4 +80,15 @@
 		});
 	});
 </script>
+<br>
+{% block detial %}{% endblock %}
+
+<hr color="#d8d8d8">
+<p align="center"><font face="楷体"size="2"color="#5e717f">虞天明|符文杰|焦虞涵|李冠豪|张霖|袁其升</font></p>
+<!--
+<div align="center">
+    <a href="mailto:liyutong@xiyoulinux.org"><span><font face="楷体"size="2"color="#5e717f">联系我们 | </font></span></a>
+<span data-toggle="modal" data-target="#myModal"><font face="楷体"size="2"color="#5e717f">捐赠我们</font></span>
+</div>
+-->
 			
