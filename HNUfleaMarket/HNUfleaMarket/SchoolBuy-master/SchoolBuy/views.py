@@ -44,7 +44,42 @@ def login(request):
 
     else:
         return render(request, 'SchoolBuy/Login.html')
-    
+   
+#查看商品具体信息
+def look_goods(request,number):
+    goods = GoodsMessage.objects.filter(id = number).first()
+
+    if(goods):
+        profile = UserProfile.objects.get(User=goods.Owner)
+        #增加访问量
+        goods.PV = goods.PV + 1
+        goods.save()
+        #抓取图片
+        image = goods.Images.all()
+        #抓取回复
+        words = GoodsWords.objects.filter(Owner=goods,Display=True)
+
+        user = request.user
+
+        f = GoodsWordsForm()
+        return render(request,'SchoolBuy/GoodsMessage.html',{'uid':user.id,'words':words,'form':f,'profile':profile,'goods':goods,'image':image})
+    else:
+        raise Http404()
+
+def return_page_list(max,now,each):
+
+    offset = each//2
+    if max<=each:
+        list = range(1,max+1)
+    else:
+        if now-offset > 0 and now+offset<=max:
+            list = range(now-offset,now+offset+1)
+        elif now-offset > 0 and now+offset>max:
+            list = range(max-offset*2,max+1)
+        else :
+            list = range(1,2+offset*2)
+    return list
+
     #所有商品
 @csrf_exempt
 def goods_list(request):
