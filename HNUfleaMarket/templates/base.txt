@@ -101,4 +101,21 @@
 				<h4 class="modal-title" id="myModalLabel">
 					请给我们动力完善的更好
 				</h4>
-			</div>			
+			</div>
+			<div class="modal-body" style="height: 250px">
+                <div style="float: left">
+                    <ul>
+                        <li>
+                            <img src="/static/SchoolBuy/images/PayPal.jpg" width="200" height="200">
+                        </li>
+                        <li>支付宝</li>
+                    </ul>
+                </div>
+                <div style="float: left">
+                    <ul >
+                    <li>
+                        <img src="/static/SchoolBuy/images/wechatpay.png" width="200" height="200">
+                    </li>
+                    <li>微信</li>
+                </ul>
+                </div>
