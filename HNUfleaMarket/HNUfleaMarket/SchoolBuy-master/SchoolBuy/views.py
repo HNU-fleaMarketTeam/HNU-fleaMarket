@@ -193,8 +193,6 @@ def bind_email(request):
                        'pass_form': pass_form, 'email_form': email_form,
                        'user': request.user})
     
-    @login_required
-    
 @login_required
 #修改密码
 def change_passwd(request):
