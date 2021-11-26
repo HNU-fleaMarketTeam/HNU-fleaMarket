@@ -85,6 +85,40 @@ def goods_list(request):
     pg.canshu = str
     return render(request,'SchoolBuy/GoodsList.html',{'goods':goods,'form':form,'page':pg})
 
+@login_required
+#发布商品留言
+def goods_reply(request):
+
+    #只接受POST
+    if request.method != "POST":
+        raise Http404()
+
+
+    f = GoodsWordsForm(request.POST)
+    if(f.is_valid()):
+        owner = request.POST.get('goods_id',None)
+        goods = GoodsMessage.objects.filter(id=owner,Is_alive=True).first()
+        # 发表留言所属的商品不存在或已经下架
+        if not owner or not goods:
+            return HttpResponse("似乎有点问题，重试试吧！")
+
+        reply = GoodsWords()
+        reply.Words = f.cleaned_data['Words']
+        reply.Time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        reply.Owner = goods
+        reply.From = UserProfile.objects.get(User=request.user)
+        to = f.cleaned_data['To']
+        #验证回复给的留言是否属于该商品
+        t = GoodsWords.objects.filter(id=to,Owner=goods).first()
+        if to and t:
+            reply.To = t
+        reply.save()
+        #添加留言推送
+        add_push_mess(goods,reply,request.user)
+        return HttpResponseRedirect('/goods/'+str(goods.id))
+    else:
+        return HttpResponse('请正确填写回复内容')
+
     #保存头像
 def savehead(pic):
     if not os.path.exists(os.path.join(settings.MEDIA_ROOT, 'head')):
