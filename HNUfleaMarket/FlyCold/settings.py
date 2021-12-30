@@ -146,7 +146,7 @@ EMAIL_HOST_USER =
 EMAIL_HOST_PASSWORD =
 DEFAULT_FROM_EMAIL = 
 
-ADMIN_EMAIL = '1041984720@qq.com'  #接受用户注册信息的管理员邮箱
+ADMIN_EMAIL = ''  #接受用户注册信息的管理员邮箱
 
 if DEBUG:
     HOST_URL_ADDRESS = 'http://127.0.0.1:8000'
