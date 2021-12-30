@@ -138,17 +138,17 @@ LOGIN_URL = '/login/'
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBa
-#方便大家测试贡献出来的邮箱
+
 EMAIL_USE_TLS = False
 EMAIL_HOST = 'smtp.163.com'
 EMAIL_PORT = 25
-EMAIL_HOST_USER = 'flywithme_fatret@163.com'
-EMAIL_HOST_PASSWORD = '52Django'
-DEFAULT_FROM_EMAIL = '校园买 <flywithme_fatret@163.com>'
+EMAIL_HOST_USER = 
+EMAIL_HOST_PASSWORD =
+DEFAULT_FROM_EMAIL = 
 
 ADMIN_EMAIL = '1041984720@qq.com'  #接受用户注册信息的管理员邮箱
 
 if DEBUG:
     HOST_URL_ADDRESS = 'http://127.0.0.1:8000'
 else:
-    HOST_URL_ADDRESS = 'http://flycold.cn'
+    HOST_URL_ADDRESS = 'http://120.77.34.48'
